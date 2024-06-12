@@ -30,6 +30,10 @@ import Regions from '../components/Regions';
 import Region from '../components/Region';
 import Posts from '../components/Posts';
 import Post from '../components/Post';
+import Forms from '../components/Forms';
+import Form from '../components/Form';
+import FormEntries from '../components/FormEntries';
+import FormEntry from '../components/FormEntry';
 
 const routes = [
     {
@@ -244,6 +248,31 @@ const routes = [
                 path: 'jobs/:id/edit',
                 name: 'jobs_edit',
                 component: Job,
+            },
+            {
+                path: 'forms',
+                name: 'forms',
+                component: Forms,
+            },
+            {
+                path: 'forms/add',
+                name: 'forms_add',
+                component: Form,
+            },
+            {
+                path: 'forms/:id/edit',
+                name: 'forms_edit',
+                component: Form,
+            },
+            {
+                path: 'forms/:id/entries',
+                name: 'form_entries',
+                component: FormEntries,
+            },
+            {
+                path: 'forms/:id/entries/:entryId',
+                name: 'form_entries_view',
+                component: FormEntry,
             },
             {
                 path: 'settings/users',

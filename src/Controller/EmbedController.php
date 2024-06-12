@@ -336,4 +336,27 @@ class EmbedController extends AbstractController
         return $this->render('embed/iframe/contacts.html.twig', []);
     }
 
+    #[Route('/forms/documentation.html', name: 'forms_documentation')]
+    public function formsDocumentation(string $host, string $instanceId): Response
+    {
+        $converter = new GithubFlavoredMarkdownConverter([
+            'html_input' => 'strip',
+            'allow_unsafe_links' => true,
+        ]);
+        $markdown = file_get_contents(__DIR__.'/../../documentation/forms-embed.md');
+        $markdown = str_replace('%HOST%', $host, $markdown);
+        $markdown = str_replace('%INSTANCE_ID%', $instanceId, $markdown);
+
+        return $this->render('embed/documentation.html.twig', [
+            'title' => $instanceId.'Forms Documentation',
+            'documentation' => $converter->convert($markdown),
+        ]);
+    }
+
+    #[Route('/iframe/forms-{_locale}/{id}.html', name: 'iframe_forms')]
+    public function iframeForm(Request $request): Response
+    {
+        return $this->render('embed/iframe/forms.html.twig', ['id' => $request->get('id')]);
+    }
+
 }

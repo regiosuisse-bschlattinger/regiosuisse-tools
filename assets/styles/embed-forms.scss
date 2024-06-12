@@ -1,0 +1,128 @@
+@import 'config';
+@import 'embed-config';
+@import 'mixins';
+@import 'embed-mixins';
+
+.embed-form {
+    @include embed-variables;
+    @include embed-base;
+    font-family: 'Helvetica Neue', sans-serif;
+
+    &-wrapper {
+        width: 100%;
+        max-width: 55em;
+        background-color: var(--#{$instance-id}-white);
+        border: .3em solid var(--#{$instance-id}-primary-color);
+        margin: 0 auto;
+        padding: 2em 2.5em .5em;
+        box-sizing: border-box;
+
+        @include mobile {
+            padding: 1.2em 1.5em .5em;
+        }
+    }
+
+    &-content {
+
+        h1, h2, h3 {
+            color: var(--#{$instance-id}-primary-color);
+        }
+
+        h3 {
+            font-weight: 500;
+        }
+
+        h5 {
+            font-style: italic;
+            text-align: right;
+        }
+    }
+
+    &-form-group {
+        margin-top: 3em;
+    }
+
+    &-fields {
+        @include embed-fields;
+
+        &-select {
+
+            &-options {
+
+                &-item {
+
+                    &.is-selected, &:hover {
+                        color: $white;
+                        background-color: var(--#{$instance-id}-primary-color);
+                    }
+                }
+            }
+        }
+
+        &-boolean {
+
+            label::after {
+                background-color: var(--#{$instance-id}-primary-color);
+            }
+        }
+    }
+
+    &-actions {
+        @include embed-actions;
+    }
+
+    .embed-form-button {
+        color: $white;
+        background-color: var(--#{$instance-id}-primary-color);
+        border-radius: .4rem;
+        padding: 1.1em 1.837em;
+        transition: .1s opacity linear;
+
+        &:hover {
+            background-color: var(--#{$instance-id}-primary-color);
+            opacity: .8;
+        }
+    }
+
+    .field-asterisk {
+        color: var(--#{$instance-id}-primary-color);
+    }
+
+    &-thank-you {
+        text-align: center;
+
+        &-icon {
+            width: 14em;
+            max-width: 90%;
+            height: auto;
+            margin-bottom: 1em;
+
+            g {
+
+                path {
+
+                    &:first-child {
+                        fill: var(--#{$instance-id}-grey-light);
+                    }
+                }
+
+                g {
+
+                    path {
+
+                        &:first-child {
+                            fill: var(--#{$instance-id}-primary-color);
+                        }
+                    }
+                }
+            }
+        }
+
+        &-text {
+            width: 80%;
+            margin: 0 auto;
+        }
+    }
+
+    @include embed-transitions('embed-form');
+}

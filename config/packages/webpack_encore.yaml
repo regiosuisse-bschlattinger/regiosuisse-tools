@@ -44,6 +44,8 @@ webpack_encore:
         embed-posts-latest: '%kernel.project_dir%/public/embed/posts-latest'
         embed-contacts: '%kernel.project_dir%/public/embed/contacts'
         embed-contacts-latest: '%kernel.project_dir%/public/embed/contacts-latest'
+        embed-forms: '%kernel.project_dir%/public/embed/forms'
+        embed-forms-latest: '%kernel.project_dir%/public/embed/forms-latest'
         # pass "frontend" as the 3rg arg to the Twig functions
         # {{ encore_entry_script_tags('entry1', null, 'frontend') }}
 

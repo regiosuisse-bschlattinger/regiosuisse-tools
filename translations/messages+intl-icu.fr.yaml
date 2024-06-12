@@ -78,3 +78,7 @@ Ort: 'Lieu'
 'Mail schreiben': 'Envoyer un e-mail'
 'Anrufen': 'Appeler'
 'Sprache': 'Langue'
+'Absenden': 'Envoyer'
+'Bitte wählen': 'Faire une sélection'
+'Formular wird versendet...': 'Formulaire est envoyé'
+'Mit * gekennzeichnete Felder sind Pflichtfelder.': "Les champs marqués d'un * sont obligatoires."

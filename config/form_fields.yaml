@@ -1,0 +1,74 @@
+text:
+  type: text
+  label: 'Text'
+  identifier: ''
+  name: ''
+  note: null
+  required: false
+  min: null
+  max: null
+  visible: false
+
+textarea:
+  type: textarea
+  label: 'Mehrzeiliger Text'
+  identifier: ''
+  name: ''
+  note: null
+  required: false
+  min: null
+  max: null
+  rows: 3
+  visible: false
+
+email:
+  type: email
+  label: 'Email'
+  identifier: ''
+  name: ''
+  note: null
+  default: null
+  required: false
+  showInList: false
+
+boolean:
+  type: boolean
+  label: 'Checkbox'
+  identifier: ''
+  name: ''
+  note: 'Aktivieren'
+  default: false
+  visible: false
+
+select:
+  type: select
+  label: 'Auswahl/Drop Down'
+  identifier: ''
+  name: ''
+  note: null
+  required: false
+  options: []
+  visible: false
+
+image:
+  type: image
+  label: 'Bild'
+  identifier: ''
+  name: ''
+  note: null
+  required: false
+
+file:
+  type: file
+  label: 'Datei'
+  identifier: ''
+  name: ''
+  note: null
+  required: false
+
+body:
+  formGroups:
+    formGroup:
+      fields:
+        field:
+          types: [text, textarea, email, boolean, select, image, file]

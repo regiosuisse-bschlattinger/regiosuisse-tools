@@ -243,6 +243,26 @@
                         </li>
                     </ul>
                 </li>
+                <li v-if="hasRole('ROLE_EDITOR') && $env.PLUGIN_ENABLE_FORMS">
+                    <router-link to="/forms" :class="{'router-link-parent-active': this.$route.path.startsWith('/forms')}">
+                        <span class="material-icons">vertical_split</span>
+                        <span class="label">Formulare</span>
+                    </router-link>
+                    <ul>
+                        <li>
+                            <router-link to="/forms">
+                                <span class="material-icons">list</span>
+                                <span class="label">Liste anzeigen</span>
+                            </router-link>
+                        </li>
+                        <li>
+                            <router-link to="/forms/add">
+                                <span class="material-icons">create</span>
+                                <span class="label">Neuen Eintrag erfassen</span>
+                            </router-link>
+                        </li>
+                    </ul>
+                </li>
                 <li v-if="hasRole('ROLE_ADMIN')">
                     <router-link to="/settings/users" :class="{'router-link-parent-active': this.$route.path.startsWith('/settings')}">
                         <span class="material-icons">settings</span>

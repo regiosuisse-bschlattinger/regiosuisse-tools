@@ -35,6 +35,8 @@ import contactsData from './modules/contacts-data';
 import stints from './modules/stints';
 import posts from './modules/posts';
 import tags from './modules/tags';
+import forms from './modules/forms';
+import formEntries from './modules/form-entries';
 
 //const debug = process.env.NODE_ENV !== 'production';
 const debug = false;
@@ -77,6 +79,8 @@ export default createStore({
         stints,
         posts,
         tags,
+        forms,
+        formEntries,
     },
     strict: debug,
     plugins: debug ? [createLogger()] : []

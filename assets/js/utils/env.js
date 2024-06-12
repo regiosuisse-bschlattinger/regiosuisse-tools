@@ -31,6 +31,7 @@ export default {
             PLUGIN_ENABLE_CONTACT_GROUPS: process.env.PLUGIN_ENABLE_CONTACT_GROUPS === 'true',
             PLUGIN_ENABLE_REGIONS: process.env.PLUGIN_ENABLE_REGIONS === 'true',
             PLUGIN_ENABLE_POSTS: process.env.PLUGIN_ENABLE_POSTS === 'true',
+            PLUGIN_ENABLE_FORMS: process.env.PLUGIN_ENABLE_FORMS === 'true',
 
             PROJECTS_ENABLE_COUNTRIES: process.env.PROJECTS_ENABLE_COUNTRIES === 'true',
             PROJECTS_ENABLE_PROGRAMS: process.env.PROJECTS_ENABLE_PROGRAMS === 'true',

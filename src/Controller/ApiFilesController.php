@@ -74,7 +74,6 @@ class ApiFilesController extends AbstractController
     }
     
     #[Route(path: '', name: 'create', methods: ['POST'])]
-    #[IsGranted('ROLE_EDITOR')]
     #[OA\Response(
         response: 200,
         description: 'Create a file',

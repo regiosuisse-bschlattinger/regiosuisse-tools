@@ -137,10 +137,6 @@
                                                     <input type="number" class="form-control" min="1" v-model="field.rows">
                                                 </div>
                                             </template>
-                                            <div class="col-md-2">
-                                                <label>Zeichenanzahl (max)</label>
-                                                <input type="number" class="form-control" v-model="field.max">
-                                            </div>
                                         </div>
                                     </template>
 

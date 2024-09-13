@@ -708,7 +708,7 @@ class ApiFormEntriesController extends AbstractController
 
                         if(!$locale || !$formEntry->getTranslations() || count($formEntry->getTranslations()) <= 0
                             || !isset($formEntry->getTranslations()[$locale]) || $formEntry->getLanguage() === $locale
-                            || $field['type'] === 'image' || $field['type'] === 'file') {
+                            || $field['type'] === 'image' || $field['type'] === 'file' || $field['type'] === 'list_amount') {
                             $value = $formEntry->getContent()[$field['identifier']] ?? '';
                         } else {
                             $value = $formEntry->getTranslations()[$locale][$field['identifier']] ?? '';

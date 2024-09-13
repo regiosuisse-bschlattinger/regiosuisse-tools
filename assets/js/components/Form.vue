@@ -170,22 +170,14 @@
                                     <template v-if="field.type === 'list_amount'">
                                         <template v-for="(element, idx) of form.config[index].fields[fieldIndex].elements">
                                             <div class="row">
-                                                <div class="col-md-9" v-if="locale === 'de'">
+                                                <div class="col-md-10" v-if="locale === 'de'">
                                                     <label>Listenelement</label>
                                                     <input type="text" class="form-control" v-model="element.name" :placeholder="translateField(element, 'name', locale)">
                                                 </div>
-                                                <div class="col-md-9" v-else>
+                                                <div class="col-md-10" v-else>
                                                     <label>Listenelement (Übersetzung {{ locale.toUpperCase() }})</label>
                                                     <input type="text" class="form-control" :placeholder="translateField(element, 'name', locale)"
                                                            :value="element.translations[locale].name || ''" @input="element.translations[locale].name = $event.target.value">
-                                                </div>
-                                                <div class="col-md-1">
-                                                    <label>Min</label>
-                                                    <input type="number" class="form-control" :value="element.min" @input="element.min = $event.target.value">
-                                                </div>
-                                                <div class="col-md-1">
-                                                    <label>Max</label>
-                                                    <input type="number" class="form-control" :value="element.max" @input="element.max = $event.target.value">
                                                 </div>
                                                 <div class="col-md-1" :style="{ 'align-self': 'flex-end' }">
                                                     <div class="button warning" @click="form.config[index].fields[fieldIndex].elements.splice(idx, 1)">-</div>
@@ -407,8 +399,6 @@ export default {
             let element = {
                 name: '',
                 note: null,
-                min: null,
-                max: null,
                 translations: {
                     it: {
                         name: '',

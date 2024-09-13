@@ -131,7 +131,7 @@
                                 <div class="embed-form-fields-list-amount-elements">
                                     <div class="embed-form-fields-list-amount-elements-element" v-for="(element, index) of field.elements">
                                         <label>{{ translateField(element, 'name', locale) }}<span class="field-note">{{ translateField(element, 'note', locale) }}</span></label>
-                                        <input type="number" :class="{ 'has-error': !isValid && errors.find(error => error.field === field.identifier) }" :min="element.min || 0" :max="element.max"
+                                        <input type="number" :class="{ 'has-error': !isValid && errors.find(error => error.field === field.identifier) }"
                                                :value="formEntry.content[field.identifier]?.find((el) => el.index === index)?.value || 0" @change="editListElement($event.target.value, field.identifier, index, element.name); validateFormData(field, $event.target.value)">
                                     </div>
                                 </div>

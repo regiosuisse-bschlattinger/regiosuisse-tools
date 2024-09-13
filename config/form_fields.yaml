@@ -29,7 +29,7 @@ email:
   note: null
   default: null
   required: false
-  showInList: false
+  visible: false
 
 boolean:
   type: boolean
@@ -52,7 +52,7 @@ select:
 
 image:
   type: image
-  label: 'Bild'
+  label: 'Bild(er)'
   identifier: ''
   name: ''
   note: null
@@ -60,15 +60,32 @@ image:
 
 file:
   type: file
-  label: 'Datei'
+  label: 'Datei(en)'
   identifier: ''
   name: ''
   note: null
   required: false
+
+list:
+  type: list
+  label: 'Auflistung'
+  identifier: ''
+  name: ''
+  note: null
+  required: false
+
+list_amount:
+  type: list_amount
+  label: 'Auflistung mit Mengenauswahl'
+  identifier: ''
+  name: ''
+  note: null
+  required: false
+  elements: []
 
 body:
   formGroups:
     formGroup:
       fields:
         field:
-          types: [text, textarea, email, boolean, select, image, file]
+          types: [text, textarea, email, boolean, select, image, file, list, list_amount]

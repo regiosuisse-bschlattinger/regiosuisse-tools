@@ -71,6 +71,23 @@ const actions = {
         });
     },
 
+    translate ({ commit }, payload) {
+        commit('loaders/showLoader', 'formEntries/'+payload.id, { root: true });
+        return api.formEntries.translate(payload.id, payload).then((response) => {
+            commit('loaders/hideLoader', 'formEntries/'+payload.id, { root: true });
+            if(payload.addToInbox) {
+                if(payload.inboxId) {
+                    commit('inbox/update', response.data, { root: true });
+                } else {
+                    commit('inbox/insert', response.data, { root: true });
+                }
+            } else {
+                commit('update', response.data);
+                commit('set', response.data);
+            }
+        });
+    },
+
 };
 
 // mutations
@@ -90,6 +107,17 @@ const mutations = {
 
     insert (state, formEntry) {
         state.all = [...state.all, formEntry];
+    },
+
+    update (state, formEntry) {
+        let existingFormEntry = state.all.find(p => p.id === formEntry.id);
+        if(existingFormEntry) {
+            state.all[state.all.indexOf(existingFormEntry)] = formEntry;
+        }
+        existingFormEntry = state.filtered.find(p => p.id === formEntry.id);
+        if(existingFormEntry) {
+            state.filtered[state.filtered.indexOf(existingFormEntry)] = formEntry;
+        }
     },
 
     remove (state, id) {

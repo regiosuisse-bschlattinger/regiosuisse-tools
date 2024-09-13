@@ -440,7 +440,7 @@
     flex-wrap: wrap;
     align-items: center;
 
-    &-input, &-textarea, &-select, &-boolean, &-image, &-file {
+    &-input, &-textarea, &-select, &-boolean, &-image, &-file, &-list, &-list-amount {
         position: relative;
         flex: 0 0 calc(100% / 3 - var(--#{$instance-id}-gutter-width));
         margin-top: calc(var(--#{$instance-id}-gutter-width) * 0.8);
@@ -476,7 +476,6 @@
             padding-top: .6em;
             padding-bottom: .6em;
             border: 1px solid var(--#{$instance-id}-grey-mid);
-            background-color: var(--#{$instance-id}-grey-ultralight);
             transition: border-color .2s ease-in-out;
 
             &:focus {
@@ -492,8 +491,11 @@
             font-weight: 500;
 
             .field-note {
+                display: block;
                 font-size: .75em;
                 font-weight: normal;
+                color: $grey-mid;
+                margin-top: .5em;
                 margin-left: .2em;
             }
 
@@ -516,13 +518,21 @@
     }
 
     &-input,
+    &-textarea,
+    &-select {
+        display: flex;
+        flex-direction: column;
+        row-gap: .6em;
+    }
+
+    /*&-input,
     &-select {
         width: 60%;
 
         @include mobile {
             width: 100%;
         }
-    }
+    }*/
 
     &-select {
         @include disable-select;
@@ -581,11 +591,10 @@
 
         input {
             position: absolute;
-            top: 50%;
+            top: .2em;
             width: 1.2rem;
             height: 1.2rem;
             opacity: 0;
-            transform: translateY(-50%);
             cursor: pointer;
 
             &:checked {
@@ -622,27 +631,27 @@
                 content: "";
                 display: block;
                 position: absolute;
-                top: 50%;
                 box-sizing: border-box;
                 pointer-events: none;
-                transform: translateY(-50%);
             }
 
             &::before {
+                top: .2em;
                 left: 0;
                 width: 1.2em;
                 height: 1.2em;
-                background-color: var(--#{$instance-id}-grey-ultralight);
                 border: 1px solid var(--#{$instance-id}-grey-mid);
             }
 
             &::after {
+                top: calc(.2em + 1.2em / 2);
                 left: .25em;
                 width: .7em;
                 height: .7em;
                 background-color: var(--#{$instance-id}-primary-color);;
                 opacity: 0;
                 visibility: hidden;
+                transform: translateY(-50%);
                 transition: opacity .2s ease-in-out, visibility .2s ease-in-out, border-color .2s ease-in-out;
             }
 
@@ -655,10 +664,44 @@
     }
 
     &-image,
+    &-file,
+    &-list {
+
+        &-wrapper {
+            display: flex;
+            align-items: center;
+            column-gap: 1em;
+            margin-top: 1em;
+        }
+
+        &-text {
+
+            div {
+                font-size: .9em;
+
+                i {
+                    color: var(--#{$instance-id}-grey-mid);
+                    text-decoration: underline;
+                    margin-right: 1em;
+                }
+
+                span {
+                    cursor: pointer;
+                }
+            }
+        }
+
+        label {
+
+            &.has-error,
+            &.has-error > .field-asterisk {
+                color: $error;
+            }
+        }
+    }
+
+    &-image,
     &-file {
-        display: flex;
-        align-items: center;
-        column-gap: 1em;
 
         &-field {
 
@@ -696,22 +739,12 @@
                 }
             }
         }
+    }
 
-        &-text {
+    &-list {
 
-            div {
-                font-size: .9em;
-
-                i {
-                    color: var(--#{$instance-id}-grey-mid);
-                    text-decoration: underline;
-                    margin-right: 1em;
-                }
-
-                span {
-                    cursor: pointer;
-                }
-            }
+        &-field {
+            width: 100%;
         }
     }
 

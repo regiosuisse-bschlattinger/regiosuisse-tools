@@ -1501,6 +1501,42 @@ th, td {
 
 }
 
+.form-entry-component {
+
+  label {
+    color: $black;
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-bottom: .8em;
+  }
+
+  &-form-section {
+
+    &-group {
+      display: flex;
+      flex-wrap: wrap;
+      column-gap: 2em;
+      row-gap: 2em;
+    }
+
+    &-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      &:not(:last-child) {
+        margin-bottom: 1em;
+      }
+    }
+
+    input[type="number"] {
+      width: 5em;
+      padding: .3em;
+      box-sizing: border-box;
+    }
+  }
+}
+
 .interactive-graphic-editor-component {
   display: flex;
   padding: 1em;

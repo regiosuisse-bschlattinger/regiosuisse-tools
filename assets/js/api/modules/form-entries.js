@@ -26,4 +26,8 @@ export default {
         return axios.delete(endpoint+'/'+id);
     },
 
+    translate(id, payload) {
+        return axios.put(endpoint+'/translate/'+id, payload);
+    },
+
 };

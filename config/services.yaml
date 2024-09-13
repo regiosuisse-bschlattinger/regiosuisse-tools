@@ -47,3 +47,7 @@ services:
         bind:
             $url: '%env(TPOINT_URL)%'
 
+    App\Service\FormEntryService:
+        bind:
+            $deeplApiKey: '%env(DEEPL_API_KEY)%'
+

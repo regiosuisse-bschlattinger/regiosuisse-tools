@@ -6,14 +6,12 @@
 
             <div class="embed-form-content" v-if="!formIsSent && form?.id">
 
-                <h5>{{ $t('Mit * gekennzeichnete Felder sind Pflichtfelder.', locale) }}</h5>
-
                 <div class="embed-form-form-group" v-for="(formGroup, index) of form.config">
 
                     <h3 v-if="formGroup.name">{{ translateField(formGroup, 'name', locale) }}</h3>
 
                     <template v-for="field in formGroup.fields">
-                        <template v-if="field.type === 'text'">
+                        <template v-if="field.type === 'text' || field.type === 'link'">
                             <div class="embed-form-fields-input">
                                 <label>{{ translateField(field, 'name', locale) }}<span class="field-asterisk" v-if="field.required">*</span> <span class="field-note">{{ translateField(field, 'note', locale) }}</span></label>
                                 <input type="text" :class="{ 'has-error': !isValid && errors.find(error => error.field === field.identifier) }" v-model="formEntry.content[field.identifier]" @input="validateFormData(field, $event.target.value)">
@@ -61,35 +59,81 @@
                         </template>
                         <template v-else-if="field.type === 'image'">
                             <div class="embed-form-fields-image">
-                                <div class="embed-form-fields-image-field">
-                                    <input type="file" :id="'upload_'+field.identifier" :class="{ 'has-error': !isValid && errors.find(error => error.field === field.identifier) }"
-                                           :ref="'upload_'+field.identifier" @change="clickUploadFile(field.identifier); validateFormData(field, $event.target.value)"
-                                           :accept="'.jpg,.png,.gif'">
-                                    <label :for="'upload_'+field.identifier">
-                                        <span v-if="formEntry.content[field.identifier]">✔</span>
-                                        <span v-else>+</span>
-                                    </label>
-                                </div>
                                 <div class="embed-form-fields-image-text">
-                                    <label @click="clickRemoveFile(field.identifier, true)">{{ translateField(field, 'name', locale) }}<span class="field-asterisk" v-if="field.required">*</span> <span class="field-note">{{ translateField(field, 'note', locale) }}</span></label>
-                                    <div v-if="formEntry.content[field.identifier]"><i>{{ formEntry.content[field.identifier].name }}</i><span @click="clickRemoveFile(field.identifier)">[Entfernen]</span></div>
+                                    <label :class="{ 'has-error': !isValid && errors.find(error => error.field === field.identifier) }">{{ translateField(field, 'name', locale) }}<span class="field-asterisk" v-if="field.required">*</span> <span class="field-note">{{ translateField(field, 'note', locale) }}</span></label>
+                                </div>
+                                <div class="embed-form-fields-image-wrapper" v-for="(image, index) of formEntry.content[field.identifier]">
+                                    <div class="embed-form-fields-image-field">
+                                        <input type="file" :id="'upload_'+field.identifier+'_'+index" :class="{ 'has-error': !isValid && errors.find(error => error.field === field.identifier) }"
+                                               :ref="'upload_'+field.identifier+'_'+index" @change="clickUploadFile(field.identifier, index); validateFormData(field, $event.target.value)"
+                                               :accept="'.jpg,.png,.gif'">
+                                        <label :for="'upload_'+field.identifier+'_'+index">
+                                            <span v-if="formEntry.content[field.identifier][index]?.name">✔</span>
+                                            <span v-else>+</span>
+                                        </label>
+                                    </div>
+                                    <div class="embed-form-fields-image-text">
+                                        <div v-if="formEntry.content[field.identifier][index]?.name"><i>{{ formEntry.content[field.identifier][index].name }}</i><span @click="clickRemoveFile(field, index)">[{{ $t('Entfernen', locale) }}]</span></div>
+                                        <label v-else>{{ $t('Bild', locale) }} #{{ index + 1 }}</label>
+                                    </div>
+                                </div>
+                                <div class="embed-form-fields-button">
+                                    <a href="#" class="button primary" @click="clickAddField(field.identifier, {})">+ {{ $t('Bild hinzufügen', locale) }}</a>
                                 </div>
                             </div>
                         </template>
                         <template v-else-if="field.type === 'file'">
                             <div class="embed-form-fields-file">
-                                <div class="embed-form-fields-file-field">
-                                    <input type="file" :id="'upload_'+field.identifier" :class="{ 'has-error': !isValid && errors.find(error => error.field === field.identifier) }"
-                                           :ref="'upload_'+field.identifier" @change="clickUploadFile(field.identifier); validateFormData(field, $event.target.value)"
-                                           :accept="'.pdf,.doc,.docx,.zip,.rar,.7zip,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document'">
-                                    <label :for="'upload_'+field.identifier">
-                                        <span v-if="formEntry.content[field.identifier]">✔</span>
-                                        <span v-else>+</span>
-                                    </label>
-                                </div>
                                 <div class="embed-form-fields-file-text">
-                                    <label @click="clickRemoveFile(field.identifier, true)">{{ translateField(field, 'name', locale) }}<span class="field-asterisk" v-if="field.required">*</span> <span class="field-note">{{ translateField(field, 'note', locale) }}</span></label>
-                                    <div v-if="formEntry.content[field.identifier]"><i>{{ formEntry.content[field.identifier].name }}</i><span @click="clickRemoveFile(field.identifier)">[Entfernen]</span></div>
+                                    <label :class="{ 'has-error': !isValid && errors.find(error => error.field === field.identifier) }">{{ translateField(field, 'name', locale) }}<span class="field-asterisk" v-if="field.required">*</span> <span class="field-note">{{ translateField(field, 'note', locale) }}</span></label>
+                                </div>
+                                <div class="embed-form-fields-file-wrapper" v-for="(image, index) of formEntry.content[field.identifier]">
+                                    <div class="embed-form-fields-file-field">
+                                        <input type="file" :id="'upload_'+field.identifier+'_'+index" :class="{ 'has-error': !isValid && errors.find(error => error.field === field.identifier) }"
+                                               :ref="'upload_'+field.identifier+'_'+index" @change="clickUploadFile(field.identifier, index); validateFormData(field, $event.target.value)"
+                                               :accept="'.pdf,.doc,.docx,.zip,.rar,.7zip,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document'">
+                                        <label :for="'upload_'+field.identifier+'_'+index">
+                                            <span v-if="formEntry.content[field.identifier][index]?.name">✔</span>
+                                            <span v-else>+</span>
+                                        </label>
+                                    </div>
+                                    <div class="embed-form-fields-file-text">
+                                        <div v-if="formEntry.content[field.identifier][index]?.name"><i>{{ formEntry.content[field.identifier][index].name }}</i><span @click="clickRemoveFile(field, index)">[Entfernen]</span></div>
+                                        <label v-else>{{ $t('Datei', locale) }} #{{ index + 1 }}</label>
+                                    </div>
+                                </div>
+                                <div class="embed-form-fields-button">
+                                    <a href="#" class="button primary" @click="clickAddField(field.identifier, {})">+ {{ $t('Datei hinzufügen', locale) }}</a>
+                                </div>
+                            </div>
+                        </template>
+                        <template v-else-if="field.type === 'list'">
+                            <div class="embed-form-fields-list">
+                                <div class="embed-form-fields-list-text">
+                                    <label :class="{ 'has-error': !isValid && errors.find(error => error.field === field.identifier) }">{{ translateField(field, 'name', locale) }}<span class="field-asterisk" v-if="field.required">*</span> <span class="field-note">{{ translateField(field, 'note', locale) }}</span></label>
+                                </div>
+                                <div class="embed-form-fields-list-wrapper" v-for="(element, index) of formEntry.content[field.identifier]">
+                                    <div class="embed-form-fields-list-field">
+                                        <input type="text" :class="{ 'has-error': !isValid && errors.find(error => error.field === field.identifier) }"
+                                               @input="formEntry.content[field.identifier][index] = $event.target.value; validateFormData(field, $event.target.value)">
+                                    </div>
+                                </div>
+                                <div class="embed-form-fields-button">
+                                    <a href="#" class="button primary" @click="clickAddField(field.identifier)">+ {{ $t('Element hinzufügen', locale) }}</a>
+                                </div>
+                            </div>
+                        </template>
+                        <template v-if="field.type === 'list_amount'">
+                            <div class="embed-form-fields-list-amount">
+                                <div class="embed-form-fields-input">
+                                    <label>{{ translateField(field, 'name', locale) }}<span class="field-note">{{ translateField(field, 'note', locale) }}</span></label>
+                                </div>
+                                <div class="embed-form-fields-list-amount-elements">
+                                    <div class="embed-form-fields-list-amount-elements-element" v-for="(element, index) of field.elements">
+                                        <label>{{ translateField(element, 'name', locale) }}<span class="field-note">{{ translateField(element, 'note', locale) }}</span></label>
+                                        <input type="number" :class="{ 'has-error': !isValid && errors.find(error => error.field === field.identifier) }" :min="element.min || 0" :max="element.max"
+                                               :value="formEntry.content[field.identifier]?.find((el) => el.index === index)?.value || 0" @change="editListElement($event.target.value, field.identifier, index, element.name); validateFormData(field, $event.target.value)">
+                                    </div>
                                 </div>
                             </div>
                         </template>
@@ -100,14 +144,8 @@
             </div>
 
             <div class="embed-form-actions" v-if="!isLoading && !formIsSent">
-
-                <div class="embed-form-actions-item">
-
-                    <a class="embed-form-button is-disabled" v-if="formIsSending">{{ $t('Formular wird versendet...', locale) }}</a>
-                    <a class="embed-form-button" @click="clickSubmit" v-else>{{ $t('Absenden', locale) }}</a>
-
-                </div>
-
+                <a class="embed-form-button is-disabled" v-if="formIsSending">{{ $t('Formular wird versendet...', locale) }}</a>
+                <a class="embed-form-button" @click="clickSubmit" v-else>{{ $t('Absenden', locale) }}</a>
             </div>
 
             <div class="embed-form-content" v-if="form && formIsSent">
@@ -132,7 +170,7 @@
             </div>
 
         </div>
-        
+
     </div>
 
 </template>
@@ -151,8 +189,10 @@ export default {
             formIsSent: false,
             form: null,
             formEntry: {
+                language: '',
                 content: {},
                 form: null,
+                translations: {},
             },
             activeSelect: null,
             isValid: true,
@@ -170,6 +210,13 @@ export default {
         responsive () {
             return this.$clientOptions?.responsive ?? true;
         },
+        langMapping() {
+            return {
+                de: 'Deutsch',
+                fr: 'Français',
+                it: 'Italiano',
+            }
+        }
     },
     methods: {
         translateField,
@@ -203,10 +250,10 @@ export default {
 
             this.activeSelect = identifier;
         },
-        clickUploadFile (identifier) {
-            let files = this.$refs['upload_'+identifier][0].files;
+        clickUploadFile (identifier, index) {
+            let files = this.$refs['upload_'+identifier+'_'+index][0].files;
 
-            this.formEntry.content[identifier] = null;
+            this.formEntry.content[identifier][index] = null;
 
             if(!files.length) {
                 return;
@@ -239,7 +286,7 @@ export default {
                     item.data = image;
 
                     this.$store.dispatch('files/create', item).then((file) => {
-                        return this.formEntry.content[identifier] = file;
+                        return this.formEntry.content[identifier][index] = file;
                     }).catch(err => {
                         alert('File could not be uploaded.')
                     }) ;
@@ -272,15 +319,14 @@ export default {
                 return onComplete(canvas.toDataURL(mimeType, .9));
             };
         },
-        clickRemoveFile(identifier) {
-            let files = this.$refs['upload_'+identifier][0].files;
+        clickRemoveFile(field, index) {
+            this.$refs['upload_'+field.identifier+'_'+index][0].value = null;
+            this.formEntry.content[field.identifier].splice(index, 1);
 
-            if(!files.length) {
-                return;
-            }
-
-            this.$refs['upload_'+identifier][0].value = null;
-            this.formEntry.content[identifier] = null;
+            this.validateFormData(field, this.formEntry.content[field.identifier]);
+        },
+        clickRemoveListElement(identifier, index) {
+            this.formEntry.content[identifier].splice(index, 1);
         },
         validateFormData(field, data) {
             let errorIndex = this.errors.indexOf(this.errors.find(error => error.field === field.identifier));
@@ -302,25 +348,49 @@ export default {
                 }
             }
 
-            if(field.type === 'email') {
+            if(field.type === 'email' && data?.length) {
                 if(!/\S+@\S+\.\S+/.test(data)) {
                     return this.errors.push({ field: field.identifier });
                 }
             }
+
+            if(field.type === 'image' || field.type === 'file' || field.list === 'list') {
+                if(field.required && !data.length) {
+                    return this.errors.push({ field: field.identifier });
+                }
+            }
         },
-        resetFormData() {
+        clickAddField(identifier, emptyElement = '') {
+            if(!this.formEntry.content[identifier]) {
+                this.formEntry.content[identifier] = [];
+            }
 
-            let originalFormData = {
-                firstName: '',
-                lastName: '',
-                email: '',
-                phone: '',
-                company: '',
-                request: '',
-            };
+            this.formEntry.content[identifier].push(emptyElement);
+        },
+        editListElement(value, fieldIdentifier, index, label) {
+            if(!this.formEntry.content[fieldIdentifier]) {
+                this.formEntry.content[fieldIdentifier] = [];
+            }
 
-            this.$store.commit('customContactForms/setFormData', originalFormData);
-            this.privacy = false;
+            let existingListElement = this.formEntry.content[fieldIdentifier].find((element) => {
+                return element.index === index;
+            })
+
+            if(existingListElement) {
+                if(!value) {
+                    return this.formEntry.content[fieldIdentifier].splice(this.formEntry.content[fieldIdentifier].indexOf(existingListElement), 1);
+                }
+
+                return existingListElement.value = value;
+            }
+
+            if(value) {
+                this.formEntry.content[fieldIdentifier].push({
+                    index,
+                    label,
+                    value
+                });
+            }
         },
         clickSubmit() {
             if(this.errors.length) {

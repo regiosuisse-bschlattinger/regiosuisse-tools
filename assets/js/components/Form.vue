@@ -15,8 +15,6 @@
                     <a @click="locale = 'de'" class="button" :class="{primary: locale === 'de'}">DE</a>
                     <a @click="locale = 'fr'" class="button" :class="{primary: locale === 'fr'}">FR</a>
                     <a @click="locale = 'it'" class="button" :class="{primary: locale === 'it'}">IT</a>
-                    <a @click="locale = 'en'" class="button" :class="{primary: locale === 'en'}">EN</a>
-                    <a @click="locale = 'si'" class="button" :class="{primary: locale === 'si'}">SI</a>
                     <a class="button error" @click="clickDelete()" v-if="form.id">Löschen</a>
                     <a class="button warning" @click="clickCancel()">Abbrechen</a>
                     <a class="button primary" @click="clickSave()">Speichern</a>
@@ -89,7 +87,7 @@
                                         <div class="col-md-4">
                                             <label>Feldtyp</label>
                                             <div class="select-wrapper">
-                                                <select class="form-control" :value="form.config[index].fields[fieldIndex].type || 'text'" @change="form.config[index].fields[fieldIndex] = { ...formConfig[$event.target.value], translations: {} }">
+                                                <select class="form-control" :value="form.config[index].fields[fieldIndex].type || 'text'" @change="form.config[index].fields[fieldIndex] = { ...formConfig[$event.target.value], translations: {} }; form.config[index].fields[fieldIndex].type === 'list_amount' && clickAddFieldListElement(index, fieldIndex)">
                                                     <option :value="fieldType" v-for="fieldType in formConfig.body.formGroups.formGroup.fields.field.types">{{ formConfig[fieldType].label }}</option>
                                                 </select>
                                             </div>
@@ -154,18 +152,53 @@
                                         </div>
                                     </template>
 
-                                    <div class="row">
-                                        <div class="col-md-4 form-component-form-checkbox">
-                                            <input type="checkbox" v-model="field.required">
-                                            <label>Erforderlich</label>
-                                        </div>
-                                        <template v-if="field.type !== 'boolean' && field.type !== 'image' && field.type !== 'file'">
+                                    <template v-if="field.type !== 'list_amount'">
+                                        <div class="row">
                                             <div class="col-md-4 form-component-form-checkbox">
-                                                <input type="checkbox" v-model="field.visible">
-                                                <label>In Liste ausgeben</label>
+                                                <input type="checkbox" v-model="field.required">
+                                                <label>Erforderlich</label>
+                                            </div>
+                                            <template v-if="field.type !== 'boolean' && field.type !== 'image' && field.type !== 'file' && field.type !== 'list'">
+                                                <div class="col-md-4 form-component-form-checkbox">
+                                                    <input type="checkbox" v-model="field.visible">
+                                                    <label>In Liste ausgeben</label>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+
+                                    <template v-if="field.type === 'list_amount'">
+                                        <template v-for="(element, idx) of form.config[index].fields[fieldIndex].elements">
+                                            <div class="row">
+                                                <div class="col-md-9" v-if="locale === 'de'">
+                                                    <label>Listenelement</label>
+                                                    <input type="text" class="form-control" v-model="element.name" :placeholder="translateField(element, 'name', locale)">
+                                                </div>
+                                                <div class="col-md-9" v-else>
+                                                    <label>Listenelement (Übersetzung {{ locale.toUpperCase() }})</label>
+                                                    <input type="text" class="form-control" :placeholder="translateField(element, 'name', locale)"
+                                                           :value="element.translations[locale].name || ''" @input="element.translations[locale].name = $event.target.value">
+                                                </div>
+                                                <div class="col-md-1">
+                                                    <label>Min</label>
+                                                    <input type="number" class="form-control" :value="element.min" @input="element.min = $event.target.value">
+                                                </div>
+                                                <div class="col-md-1">
+                                                    <label>Max</label>
+                                                    <input type="number" class="form-control" :value="element.max" @input="element.max = $event.target.value">
+                                                </div>
+                                                <div class="col-md-1" :style="{ 'align-self': 'flex-end' }">
+                                                    <div class="button warning" @click="form.config[index].fields[fieldIndex].elements.splice(idx, 1)">-</div>
+                                                </div>
                                             </div>
                                         </template>
-                                    </div>
+
+                                        <div class="row">
+                                            <div class="form-component-form-section-form-group-field">
+                                                <div class="button primary" @click="clickAddFieldListElement(index, fieldIndex)">+</div>
+                                            </div>
+                                        </div>
+                                    </template>
 
                                     <div class="row"></div>
 
@@ -244,14 +277,6 @@ export default {
                         fields: {}
                     },
                     it: {
-                        groups: {},
-                        fields: {}
-                    },
-                    en: {
-                        groups: {},
-                        fields: {}
-                    },
-                    si: {
                         groups: {},
                         fields: {}
                     },
@@ -351,12 +376,6 @@ export default {
             if (this.locale === 'it') {
                 return context.translations.it[property] || context[property] || context.translations.fr[property];
             }
-            if (this.locale === 'en') {
-                return context.translations.en[property] || context[property] || context.translations.fr[property];
-            }
-            if (this.locale === 'si') {
-                return context.translations.si[property] || context[property] || context.translations.en[property];
-            }
             return context[property];
         },
         isTranslationModeEnabled() {
@@ -379,7 +398,29 @@ export default {
             }
 
             this.form.config[index].fields[fieldIndex].translations[this.locale][identifier] = value;
-        }
+        },
+        clickAddFieldListElement(index, fieldIndex) {
+            if(!this.form.config[index].fields[fieldIndex].elements?.length) {
+                this.form.config[index].fields[fieldIndex].elements = [];
+            }
+
+            let element = {
+                name: '',
+                note: null,
+                min: null,
+                max: null,
+                translations: {
+                    it: {
+                        name: '',
+                    },
+                    fr: {
+                        name: '',
+                    },
+                },
+            }
+
+            this.form.config[index].fields[fieldIndex].elements.push(element);
+        },
     },
     created () {
         this.reload();

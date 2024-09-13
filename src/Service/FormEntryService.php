@@ -16,16 +16,18 @@ class FormEntryService {
     protected MailerInterface $mailer;
     protected string $mailerFrom;
     protected string $host;
+    protected string $deeplApiKey;
 
-    public function __construct(EntityManagerInterface $em, MailerInterface $mailer, string $mailerFrom, string $host)
+    public function __construct(EntityManagerInterface $em, MailerInterface $mailer, string $mailerFrom, string $host, string $deeplApiKey)
     {
         $this->em = $em;
         $this->mailer = $mailer;
         $this->mailerFrom = $mailerFrom;
         $this->host = $host;
+        $this->deeplApiKey = $deeplApiKey;
     }
 
-    public function validateFields($payload, $fields = [])
+    public function validateFields($payload, $form, $fields = [])
     {
         foreach($fields as $field) {
 
@@ -40,7 +42,7 @@ class FormEntryService {
 
         $fieldsConfig = [];
 
-        foreach($payload['form']['config'] as $formGroup) {
+        foreach($form->getConfig() as $formGroup) {
             foreach($formGroup['fields'] as $field) {
                 $fieldsConfig[] = $field;
             }
@@ -54,7 +56,7 @@ class FormEntryService {
                 'field' => $fieldConfig['identifier'],
             ];
 
-            if($fieldConfig['required'] && !array_key_exists($fieldConfig['identifier'], $payload['content'])) {
+            if(isset($fieldConfig['required']) && $fieldConfig['required'] && !array_key_exists($fieldConfig['identifier'], $payload['content'])) {
                 $errors[] = $error;
                 continue;
             }
@@ -67,7 +69,7 @@ class FormEntryService {
 
             $fieldType = $fieldConfig['type'];
 
-            if($fieldConfig['required'] && !$fieldData) {
+            if(isset($fieldConfig['required']) && $fieldConfig['required'] && !$fieldData) {
                 $errors[] = $error;
                 continue;
             }
@@ -81,13 +83,19 @@ class FormEntryService {
 
                 if($fieldConfig['max'] && strlen($fieldData) > $fieldConfig['max']) {
                     $errors[] = $error;
-                    continue;
                 }
             }
 
             if($fieldType === 'email') {
 
                 if(!filter_var($fieldData, FILTER_VALIDATE_EMAIL)) {
+                    $errors[] = $error;
+                }
+            }
+
+            if($fieldType === 'image' || $fieldType === 'file' || $fieldType === 'list') {
+
+                if($fieldConfig['required'] && !count($fieldData)) {
                     $errors[] = $error;
                 }
             }
@@ -103,11 +111,14 @@ class FormEntryService {
 
     public function validateFormEntryPayload($payload)
     {
-        if(($errors = $this->validateFields($payload, [
-            'language',
-            'content',
-            'form',
-        ])) !== true) {
+        $form = $this->em->getRepository(Form::class)->find($payload['form']['id']);
+
+        if(($errors = $this->validateFields($payload, $form, [
+                'language',
+                'content',
+                'form',
+                'translations',
+            ])) !== true) {
             return $errors;
         }
 
@@ -128,9 +139,109 @@ class FormEntryService {
         return $formEntry;
     }
 
+    public function updateFormEntry($formEntry, $payload)
+    {
+        $formEntry->setUpdatedAt(new \DateTime());
+
+        $formEntry = $this->applyFormEntryPayload($payload, $formEntry);
+
+        $this->em->persist($formEntry);
+        $this->em->flush();
+
+        return $formEntry;
+    }
+
     public function deleteFormEntry($formEntry)
     {
         $this->em->remove($formEntry);
+        $this->em->flush();
+
+        return $formEntry;
+    }
+
+    public function translateFormEntry($formEntry, $lang)
+    {
+        $apiKey = $this->deeplApiKey;
+
+        $translator = new \DeepL\Translator($apiKey);
+        $fieldKeys = [];
+        $fieldValues = [];
+        $fieldKeysArray = [];
+        $fieldValuesArray = [];
+
+        $targetLang = $lang;
+
+        foreach($formEntry->getContent() as $key => $value) {
+
+            $form = $formEntry->getForm();
+            $formFieldType = '';
+
+            foreach($form->getConfig() as $fieldGroup) {
+                foreach($fieldGroup['fields'] as $field) {
+                    if($field['identifier'] === $key) {
+                        $formFieldType = $field['type'];
+                    }
+                }
+            }
+
+            if($formFieldType === 'boolean') {
+
+                if($value === true) {
+                    $value = '1';
+                }
+
+                if($value === false) {
+                    $value = '0';
+                }
+            }
+
+            if($formFieldType === 'image' || $formFieldType === 'file' || $formFieldType === 'list_amount') {
+                continue;
+            }
+
+            if($formFieldType === 'list') {
+                $fieldKeysArray[] = $key;
+                $fieldValuesArray[] = $value;
+                continue;
+            }
+
+            $fieldKeys[] = $key;
+            $fieldValues[] = $value;
+        }
+
+        $translations = [];
+
+        if(count($fieldValues) > 0) {
+            $fieldTranslations = $translator->translateText($fieldValues, null, $targetLang);
+            $translations = $formEntry->getTranslations();
+
+            foreach($fieldKeys as $index => $fieldKey) {
+                $translations[$lang][$fieldKey] = $fieldTranslations[$index]->text;
+            }
+        }
+
+        if(count($fieldValuesArray) > 0) {
+            $fieldTranslations =  [];
+            $translations = $formEntry->getTranslations();
+
+            foreach($fieldValuesArray as $array) {
+                $fieldTranslations[] = $translator->translateText($array, null, $targetLang);
+            }
+
+            foreach($fieldKeysArray as $index => $fieldKey) {
+                $translationElements = [];
+
+                foreach($fieldTranslations[$index] as $elIndex => $element) {
+                    $translationElements[] = $element->text;
+                }
+
+                $translations[$lang][$fieldKey] = $translationElements;
+            }
+        }
+
+        $formEntry->setTranslations($translations);
+
+        $this->em->persist($formEntry);
         $this->em->flush();
 
         return $formEntry;
@@ -142,6 +253,7 @@ class FormEntryService {
             ->setLanguage($payload['language'])
             ->setContent($payload['content'])
             ->setForm(null)
+            ->setTranslations($payload['translations'] ?: [])
         ;
 
         if($payload['form'] && $entity = $this->em->getRepository(Form::class)->find($payload['form']['id'])) {

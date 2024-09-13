@@ -25,31 +25,7 @@
                         <input id="term" type="text" class="form-control" v-model="term" @change="changeForm()">
                     </div>
                 </div>
-                <!--div class="col-md-2">
-                    <div class="form-group">
-                        <label for="status">Status</label>
-                        <div class="select-wrapper">
-                            <select id="status" class="form-control" @change="addFilter({type: 'status', value: $event.target.value}); $event.target.value = null;">
-                                <option></option>
-                                <option :value="'public'">Öffentlich</option>
-                                <option :value="'draft'">Entwurf</option>
-                            </select>
-                        </div>
-                    </div>
-                </div-->
             </div>
-
-            <!--div class="forms-component-filter-tags">
-                <div class="tag" v-for="filter of filters" @click="removeFilter({type: filter.type, value: filter.value})">
-                    <strong v-if="filter.type === 'status'">Status:</strong>
-                    <template v-if="['status'].includes(filter.type)">
-                        &nbsp;{{ filter.value === 'public' ? 'Öffentlich' : 'Entwurf' }}
-                    </template>
-                    <template v-else>
-                        &nbsp;{{ filter.value }}
-                    </template>
-                </div>
-            </div-->
 
         </div>
 

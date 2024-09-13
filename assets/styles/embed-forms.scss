@@ -10,9 +10,7 @@
 
     &-wrapper {
         width: 100%;
-        max-width: 55em;
         background-color: var(--#{$instance-id}-white);
-        border: .3em solid var(--#{$instance-id}-primary-color);
         margin: 0 auto;
         padding: 2em 2.5em .5em;
         box-sizing: border-box;
@@ -65,10 +63,46 @@
                 background-color: var(--#{$instance-id}-primary-color);
             }
         }
+
+        &-list-amount {
+
+            &-elements {
+                background-color: $grey-ultralight;
+                padding: 1em;
+
+                &-element {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    column-gap: 1em;
+                    row-gap: .5em;
+
+                    &:not(:last-child) {
+                        margin-bottom: 1em;
+                    }
+
+                    label {
+                        flex: 1;
+                    }
+
+                    input {
+                        width: 4em;
+                        padding: .5em;
+                        box-sizing: border-box;
+                    }
+                }
+            }
+        }
     }
 
     &-actions {
         @include embed-actions;
+        justify-content: flex-start;
+        max-width: unset;
+    }
+
+    .embed-form-fields-button {
+        margin-top: 1em;
     }
 
     .embed-form-button {

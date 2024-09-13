@@ -38,6 +38,15 @@ class FormEntry
     #[Groups(['form_entry'])]
     private ?Form $form = null;
 
+    #[ORM\Column(name: 'translations', type: 'json')]
+    #[Groups(['form_entry'])]
+    #[OA\Property(properties: [
+        new OA\Property(property: 'fr', type: 'string'),
+        new OA\Property(property: 'it', type: 'string'),
+        new OA\Property(property: 'en', type: 'string'),
+    ], type: 'object')]
+    private $translations = [];
+
     /**
      * Get id
      *
@@ -130,6 +139,30 @@ class FormEntry
         $this->form = $form;
 
         return $this;
+    }
+
+    /**
+     * Set translations
+     *
+     * @param array $translations
+     *
+     * @return FormEntry
+     */
+    public function setTranslations($translations)
+    {
+        $this->translations = $translations;
+
+        return $this;
+    }
+
+    /**
+     * Get translations
+     *
+     * @return array
+     */
+    public function getTranslations()
+    {
+        return $this->translations;
     }
 
 }
